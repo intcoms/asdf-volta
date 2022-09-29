@@ -25,9 +25,7 @@ sort_versions() {
 }
 
 list_github_tags() {
-  git ls-remote --tags --refs "$GH_REPO" |
-    grep -o 'refs/tags/.*' | cut -d/ -f3- |
-    sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
+  curl -fsSL https://api.github.com/repos/volta-cli/volta/releases | sed -nE 's/\s*"tag_name": "v([^"]+)",?/\1/p'
 }
 
 list_all_versions() {
