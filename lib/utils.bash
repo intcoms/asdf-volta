@@ -25,12 +25,18 @@ sort_versions() {
 }
 
 list_github_tags() {
+  git ls-remote --tags --refs "$GH_REPO" |
+    grep -o 'refs/tags/.*' | cut -d/ -f3- |
+    sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
+}
+
+list_github_releases() {
   curl -fsSL https://api.github.com/repos/volta-cli/volta/releases | sed -nE 's/\s*"tag_name": "v([^"]+)",?/\1/p'
 }
 
 list_all_versions() {
   # Change this function if volta has other means of determining installable versions.
-  list_github_tags
+  list_github_releases || list_github_tags
 }
 
 install_version() {
