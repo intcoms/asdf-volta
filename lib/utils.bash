@@ -49,12 +49,17 @@ install_version() {
   fi
 
   (
-    mkdir -p "$install_path"
-    cp -r "$ASDF_DOWNLOAD_PATH/" "$install_path"
-
-    # TODO: Assert volta executable exists.
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+
+    mkdir -p "$install_path"
+    cp -r "$ASDF_DOWNLOAD_PATH/" "$install_path"
+    if [[ ! -x "$install_path/bin/$tool_cmd" ]] && [[ -d "$install_path/$version" ]]; then
+      echo "Fix cp command behavior" >&2
+      # shellcheck disable=SC2115
+      mv "$install_path/$version"/* "$install_path" && rm -fr "$install_path/$version"
+    fi
+
     if [[ ! -x "$install_path/bin/$tool_cmd" ]]; then
       echo "ASDF_DOWNLOAD_PATH: $ASDF_DOWNLOAD_PATH"
       ls -lah "$ASDF_DOWNLOAD_PATH"
